@@ -1,5 +1,7 @@
 package com.TNTStudios.tanizen.client.gui;
 
+import com.TNTStudios.tanizen.client.TanizenClient;
+import com.TNTStudios.tanizen.client.data.ClientMissionLoader;
 import com.TNTStudios.tanizen.missions.SabioObsidianoMissionData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -34,7 +36,8 @@ public class SabioObsidianoScreen extends Screen {
 
     public SabioObsidianoScreen() {
         super(Text.of("El Legado del Sabio Obsidiano"));
-        this.missionData = com.TNTStudios.tanizen.client.data.ClientMissionLoader.loadFromClient(MinecraftClient.getInstance().player);
+        // Usar los datos sincronizados del cliente
+        this.missionData = TanizenClient.clientMissionData != null ? TanizenClient.clientMissionData : ClientMissionLoader.loadFromClient(MinecraftClient.getInstance().player);
         this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
     }
 

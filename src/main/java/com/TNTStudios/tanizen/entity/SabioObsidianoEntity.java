@@ -85,8 +85,8 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
                 }
             }
 
-            // Abre la GUI en cliente
-            TanizenPackets.openDialog(serverPlayer);
+            // Abre la GUI en cliente con los datos actualizados
+            TanizenPackets.openDialog(serverPlayer, data);
 
             return gaveSomething ? ActionResult.SUCCESS : ActionResult.PASS;
         }
