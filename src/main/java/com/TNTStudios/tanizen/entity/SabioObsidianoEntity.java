@@ -13,6 +13,8 @@ import software.bernie.geckolib.core.animation.AnimationState;
 import software.bernie.geckolib.core.animation.RawAnimation;
 import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.registry.tag.DamageTypeTags;
 
 public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatable {
 
@@ -51,6 +53,16 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
         return PathAwareEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20.0)
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.0); // no se mueve
+    }
+
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        return source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY);
+    }
+
+    @Override
+    public boolean canImmediatelyDespawn(double distanceSquared) {
+        return false;
     }
 
 }
