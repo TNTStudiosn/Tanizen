@@ -130,4 +130,12 @@ public class SabioObsidianoMissionData {
                 delivered.getOrDefault(entry.getKey(), 0) >= entry.getValue()
         );
     }
+    public static Path getSavePath(UUID uuid) {
+        return SAVE_FOLDER.resolve(uuid.toString() + ".json");
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
 }

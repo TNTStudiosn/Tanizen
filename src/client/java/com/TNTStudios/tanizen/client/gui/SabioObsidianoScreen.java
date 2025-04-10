@@ -22,7 +22,7 @@ public class SabioObsidianoScreen extends Screen {
 
     public SabioObsidianoScreen() {
         super(Text.of("El Legado del Sabio Obsidiano"));
-        this.missionData = SabioObsidianoMissionData.load(MinecraftClient.getInstance().player);
+        this.missionData = com.TNTStudios.tanizen.client.data.ClientMissionLoader.loadFromClient(MinecraftClient.getInstance().player);
         this.itemRenderer = MinecraftClient.getInstance().getItemRenderer();
     }
 
