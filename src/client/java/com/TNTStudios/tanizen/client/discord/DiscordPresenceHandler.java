@@ -7,7 +7,7 @@ import com.hypherionmc.craterlib.core.rpcsdk.helpers.RPCButton;
 public class DiscordPresenceHandler {
 
     private static boolean initialized = false;
-    private static final String APP_ID = "1325598588905979964";
+    private static final String APP_ID = "1357349067553898536";
 
     @SuppressWarnings("removal")
     public static void init() {
@@ -26,7 +26,7 @@ public class DiscordPresenceHandler {
         presence.details = "👾Servidor de Tanizen🐲";
         presence.state = "🌌𝗛𝗢𝗦𝗧𝗘𝗔𝗗𝗢 𝗘𝗡 𝗛𝗢𝗟𝗬𝗛𝗢𝗦𝗧𝗜𝗡𝗚🌌";
         presence.startTimestamp = System.currentTimeMillis() / 1000L;
-        presence.largeImageKey = "tanizen";
+        presence.largeImageKey = "tanizenn";
         presence.largeImageText = "🌟Serie  de Minecraft🌟";
         presence.smallImageKey = "icono";
         presence.smallImageText = "🚀TNTStudios🚀";
