@@ -4,6 +4,12 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -23,6 +29,21 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
     public SabioObsidianoEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
     }
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND) {
+            player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
+                    (syncId, inventory, p) -> new ScreenHandler(syncId) {
+                        @Override public boolean canUse(PlayerEntity player) { return true; }
+                    },
+                    Text.of("Diálogo del Sabio Obsidiano")
+            ));
+            return ActionResult.SUCCESS;
+        }
+        return super.interactMob(player, hand);
+    }
+
 
     @Override
     public boolean isAiDisabled() {
