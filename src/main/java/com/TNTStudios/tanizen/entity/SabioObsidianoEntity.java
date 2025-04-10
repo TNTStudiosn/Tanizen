@@ -7,6 +7,7 @@ import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -32,17 +33,15 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND) {
-            player.openHandledScreen(new SimpleNamedScreenHandlerFactory(
-                    (syncId, inventory, p) -> new ScreenHandler(syncId) {
-                        @Override public boolean canUse(PlayerEntity player) { return true; }
-                    },
-                    Text.of("Diálogo del Sabio Obsidiano")
-            ));
+        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND && player instanceof ServerPlayerEntity serverPlayer) {
+            // Enviar un paquete al cliente solicitando que abra la pantalla
+            TanizenNetwork.sendToClient(new OpenDialogPacket(), serverPlayer);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
+
+
 
 
     @Override
