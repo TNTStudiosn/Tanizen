@@ -56,33 +56,32 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
                     int alreadyDelivered = data.getDelivered().getOrDefault(item, 0);
                     int missing = needed - alreadyDelivered;
 
-                    // Verifica si el jugador tiene exactamente los que faltan
                     if (missing > 0 && countItem(serverPlayer, item) >= missing) {
                         removeItems(serverPlayer, item, missing);
                         data.tryDeliverItem(item, missing);
                         gaveSomething = true;
 
-                        // Reproduce sonido de entrega y notifica al jugador
                         serverPlayer.playSound(net.minecraft.sound.SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.2F);
                         player.sendMessage(Text.of("§aEntregaste " + missing + "x " + item.getName().getString() + "."), false);
                     }
                 }
             }
 
-            // Guardar el progreso
+            // Guardar el progreso antes de verificar la completitud
             data.save(serverPlayer);
 
-            // Si completó la misión, dar recompensa y notificar
-            if (data.isCompleted()) {
+            // Si la misión se completó por primera vez y no se ha dado la recompensa
+            if (data.isCompleted() && !data.isRewardGiven()) {
                 serverPlayer.playSound(net.minecraft.sound.SoundEvents.BLOCK_BELL_USE, 1.0F, 0.8F);
                 player.sendMessage(Text.of("§6¡Misión completada! Recibiste una mesa de encantamientos."), false);
 
-                // Recompensa: Mesa de encantamientos con manejo de inventario lleno
                 ItemStack reward = new ItemStack(Items.ENCHANTING_TABLE);
                 if (!serverPlayer.getInventory().insertStack(reward)) {
                     serverPlayer.dropItem(reward, false);
                     player.sendMessage(Text.of("§eTu inventario está lleno, la mesa de encantamientos está en el suelo."), false);
                 }
+                data.setRewardGiven(true); // Marcar que la recompensa fue dada
+                data.save(serverPlayer); // Guardar el estado actualizado
             }
 
             // Abre la GUI en cliente con los datos actualizados

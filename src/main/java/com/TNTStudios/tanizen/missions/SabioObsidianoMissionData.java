@@ -30,11 +30,13 @@ public class SabioObsidianoMissionData {
     private final UUID playerUUID;
     private final Map<Item, Integer> delivered = new HashMap<>();
     private boolean completed = false;
+    private boolean rewardGiven = false;
 
     public SabioObsidianoMissionData(UUID playerUUID) {
         this.playerUUID = playerUUID;
     }
 
+    // Método load actualizado
     public static SabioObsidianoMissionData load(ServerPlayerEntity player) {
         try {
             Files.createDirectories(SAVE_FOLDER);
@@ -56,6 +58,7 @@ public class SabioObsidianoMissionData {
                     }
 
                     data.completed = json.get("completado").getAsBoolean();
+                    data.rewardGiven = json.has("rewardGiven") ? json.get("rewardGiven").getAsBoolean() : false; // Cargar rewardGiven
                     return data;
                 }
             }
@@ -74,11 +77,9 @@ public class SabioObsidianoMissionData {
             JsonObject json = new JsonObject();
             JsonObject entregados = new JsonObject();
 
-            // Datos del jugador
             json.addProperty("uuid", playerUUID.toString());
             json.addProperty("nombre", player.getEntityName());
 
-            // Cantidades entregadas de cada ítem
             for (Item item : REQUIRED_ITEMS.keySet()) {
                 int entregado = delivered.getOrDefault(item, 0);
                 String id = Registries.ITEM.getId(item).toString();
@@ -87,18 +88,26 @@ public class SabioObsidianoMissionData {
 
             json.add("entregados", entregados);
             json.addProperty("completado", completed);
+            json.addProperty("rewardGiven", rewardGiven); // Guardar rewardGiven
 
             try (Writer writer = Files.newBufferedWriter(file)) {
                 GSON.toJson(json, writer);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    // Getter y Setter para rewardGiven
+    public boolean isRewardGiven() {
+        return rewardGiven;
+    }
 
+    public void setRewardGiven(boolean rewardGiven) {
+        this.rewardGiven = rewardGiven;
+    }
 
+    // Resto de los métodos sin cambios
     public boolean isCompleted() {
         return completed;
     }

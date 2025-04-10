@@ -18,13 +18,13 @@ public class TanizenPackets {
 
     public static void openDialog(ServerPlayerEntity player, SabioObsidianoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
-        // Escribir el estado de la misión en el paquete
         buf.writeUuid(player.getUuid());
         buf.writeBoolean(data.isCompleted());
+        buf.writeBoolean(data.isRewardGiven()); // Enviar rewardGiven
         buf.writeInt(data.getDelivered().size());
         for (Map.Entry<Item, Integer> entry : data.getDelivered().entrySet()) {
-            buf.writeItemStack(new ItemStack(entry.getKey())); // Ítem
-            buf.writeInt(entry.getValue()); // Cantidad entregada
+            buf.writeItemStack(new ItemStack(entry.getKey()));
+            buf.writeInt(entry.getValue());
         }
         ServerPlayNetworking.send(player, OPEN_DIALOG_SCREEN, buf);
     }

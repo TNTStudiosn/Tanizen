@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TanizenClient implements ClientModInitializer {
-    public static SabioObsidianoMissionData clientMissionData; // Almacenar datos en el cliente
+    public static SabioObsidianoMissionData clientMissionData;
 
     @Override
     public void onInitializeClient() {
@@ -28,6 +28,7 @@ public class TanizenClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.OPEN_DIALOG_SCREEN, (client, handler, buf, responseSender) -> {
             UUID playerUuid = buf.readUuid();
             boolean completed = buf.readBoolean();
+            boolean rewardGiven = buf.readBoolean(); // Leer rewardGiven
             int deliveredSize = buf.readInt();
             Map<Item, Integer> delivered = new HashMap<>();
             for (int i = 0; i < deliveredSize; i++) {
@@ -37,11 +38,10 @@ public class TanizenClient implements ClientModInitializer {
             }
 
             client.execute(() -> {
-                // Actualizar los datos del cliente
                 clientMissionData = new SabioObsidianoMissionData(playerUuid);
                 clientMissionData.getDelivered().putAll(delivered);
                 clientMissionData.setCompleted(completed);
-                // Abrir la GUI con los datos actualizados
+                clientMissionData.setRewardGiven(rewardGiven); // Establecer rewardGiven
                 client.setScreen(new SabioObsidianoScreen());
             });
         });
