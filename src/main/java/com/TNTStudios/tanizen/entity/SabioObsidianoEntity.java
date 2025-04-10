@@ -33,14 +33,13 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND && player instanceof ServerPlayerEntity serverPlayer) {
-            // Enviar un paquete al cliente solicitando que abra la pantalla
-            TanizenNetwork.sendToClient(new OpenDialogPacket(), serverPlayer);
+        if (!this.getWorld().isClient && hand == Hand.MAIN_HAND && player instanceof ServerPlayerEntity serverPlayer) {
+            // Solo llamamos al método del main => "TanizenPackets.openDialog(...)"
+            com.TNTStudios.tanizen.network.TanizenPackets.openDialog(serverPlayer);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
-
 
 
 
