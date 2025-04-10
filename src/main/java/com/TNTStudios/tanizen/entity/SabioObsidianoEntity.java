@@ -9,6 +9,7 @@ import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -44,28 +45,44 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
 
             boolean gaveSomething = false;
 
-            for (Map.Entry<Item, Integer> entry : data.getRequiredItems().entrySet()) {
-                Item item = entry.getKey();
-                int needed = entry.getValue();
-                int alreadyDelivered = data.getDelivered().getOrDefault(item, 0);
-                int missing = needed - alreadyDelivered;
+            // Verificar si la misión ya está completada
+            if (data.isCompleted()) {
+                player.sendMessage(Text.of("§aYa has completado esta misión."), false);
+            } else {
+                // Procesar entregas
+                for (Map.Entry<Item, Integer> entry : data.getRequiredItems().entrySet()) {
+                    Item item = entry.getKey();
+                    int needed = entry.getValue();
+                    int alreadyDelivered = data.getDelivered().getOrDefault(item, 0);
+                    int missing = needed - alreadyDelivered;
 
-                // Verifica si el jugador tiene exactamente los que faltan
-                if (missing > 0 && countItem(serverPlayer, item) >= missing) {
-                    removeItems(serverPlayer, item, missing);
-                    data.tryDeliverItem(item, missing);
-                    gaveSomething = true;
+                    // Verifica si el jugador tiene exactamente los que faltan
+                    if (missing > 0 && countItem(serverPlayer, item) >= missing) {
+                        removeItems(serverPlayer, item, missing);
+                        data.tryDeliverItem(item, missing);
+                        gaveSomething = true;
 
-                    // Reproduce sonido de entrega
-                    serverPlayer.playSound(net.minecraft.sound.SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.2F);
+                        // Reproduce sonido de entrega y notifica al jugador
+                        serverPlayer.playSound(net.minecraft.sound.SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.2F);
+                        player.sendMessage(Text.of("§aEntregaste " + missing + "x " + item.getName().getString() + "."), false);
+                    }
                 }
             }
 
+            // Guardar el progreso
             data.save(serverPlayer);
 
-            // Si completó la misión, reproduce sonido especial
+            // Si completó la misión, dar recompensa y notificar
             if (data.isCompleted()) {
                 serverPlayer.playSound(net.minecraft.sound.SoundEvents.BLOCK_BELL_USE, 1.0F, 0.8F);
+                player.sendMessage(Text.of("§6¡Misión completada! Recibiste una mesa de encantamientos."), false);
+
+                // Recompensa: Mesa de encantamientos con manejo de inventario lleno
+                ItemStack reward = new ItemStack(Items.ENCHANTING_TABLE);
+                if (!serverPlayer.getInventory().insertStack(reward)) {
+                    serverPlayer.dropItem(reward, false);
+                    player.sendMessage(Text.of("§eTu inventario está lleno, la mesa de encantamientos está en el suelo."), false);
+                }
             }
 
             // Abre la GUI en cliente
