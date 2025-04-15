@@ -44,6 +44,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation("software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}")
     implementation("com.eliotlash.mclib:mclib:20")
+    modImplementation "curse.maven:playerstimelimit-1235362:6384019"
+    modImplementation "curse.maven:luckperms-431733:4738951"
+    implementation 'org.yaml:snakeyaml:1.33'
 }
 
 processResources {

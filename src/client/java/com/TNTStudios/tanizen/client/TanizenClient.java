@@ -10,6 +10,7 @@ import com.TNTStudios.tanizen.client.discord.DiscordPresenceHandler;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import com.TNTStudios.tanizen.client.renderer.SabioObsidianoRenderer;
+import com.TNTStudios.tanizen.client.renderer.SrTiempoRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 
@@ -24,6 +25,7 @@ public class TanizenClient implements ClientModInitializer {
     public void onInitializeClient() {
         DiscordPresenceHandler.init();
         EntityRendererRegistry.register(TanizenEntities.SABIO_OBSIDIANO, SabioObsidianoRenderer::new);
+        EntityRendererRegistry.register(TanizenEntities.SRTIEMPO_NPC, SrTiempoRenderer::new);
 
         ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.OPEN_DIALOG_SCREEN, (client, handler, buf, responseSender) -> {
             UUID playerUuid = buf.readUuid();
