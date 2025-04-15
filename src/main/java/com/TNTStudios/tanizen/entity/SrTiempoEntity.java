@@ -1,10 +1,12 @@
 package com.TNTStudios.tanizen.entity;
 
+import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -30,12 +32,22 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
 
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
-        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND && player instanceof ServerPlayerEntity serverPlayer) {
-            com.TNTStudios.tanizen.network.TanizenPackets.openSrTiempoScreen(serverPlayer);
+        if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
+            SrTiempoMissionData data = SrTiempoMissionData.load(serverPlayer);
+            serverPlayer.sendMessage(Text.of("§bProgreso de la misión del día:"), false);
+            serverPlayer.sendMessage(Text.of("§7Zombies: " + data.getZombiesKilled() + "/10"), false);
+            serverPlayer.sendMessage(Text.of("§7Creepers: " + data.getCreepersKilled() + "/10"), false);
+            serverPlayer.sendMessage(Text.of("§7Phantoms: " + data.getPhantomsKilled() + "/10"), false);
+
+            if (data.isCompletedToday()) {
+                serverPlayer.sendMessage(Text.of("§aYa completaste esta misión hoy. ¡Vuelve mañana!"), false);
+            }
+
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
+
 
 
     @Override

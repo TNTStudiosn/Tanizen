@@ -4,6 +4,9 @@
   "package": "com.TNTStudios.tanizen.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "EnchantmentLevelLimiterMixin",
+    "LivingEntityMixin",
+    "EnchantmentTableBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
