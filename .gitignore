@@ -117,3 +117,19 @@ runs/
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+/.gitignore
+/src/main/resources/assets/tanizen/animations/
+/src/main/resources/assets/tanizen/animations/srtiempo.animation.json
+/src/main/resources/assets/tanizen/animations/sabio.animation.json
+/src/main/resources/assets/tanizen/geo/
+/src/main/resources/assets/tanizen/geo/sabio.geo.json
+/src/main/resources/assets/tanizen/geo/srtiempo.geo.json
+/src/main/resources/assets/tanizen/lang/
+/src/main/resources/assets/tanizen/lang/en_us.json
+/src/main/resources/assets/tanizen/textures/
+/src/main/resources/assets/tanizen/textures/entity/
+/src/main/resources/assets/tanizen/textures/entity/sabio.png
+/src/main/resources/assets/tanizen/textures/entity/srtiempo.png
+/src/main/resources/assets/tanizen/textures/gui/
+/src/main/resources/assets/tanizen/textures/gui/cuadro.png
+/src/main/resources/assets/tanizen/textures/gui/rendersabio.png
