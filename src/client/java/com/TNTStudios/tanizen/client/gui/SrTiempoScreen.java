@@ -7,9 +7,15 @@ import net.minecraft.text.Text;
 public class SrTiempoScreen extends Screen {
     private static final int GUI_WIDTH = 380;
     private static final int GUI_HEIGHT = 260;
+    private final int zombies, creepers, phantoms;
+    private final boolean completed;
 
-    public SrTiempoScreen() {
+    public SrTiempoScreen(int zombies, int creepers, int phantoms, boolean completed) {
         super(Text.of("Sr. Tiempo"));
+        this.zombies = zombies;
+        this.creepers = creepers;
+        this.phantoms = phantoms;
+        this.completed = completed;
     }
 
     @Override
@@ -52,6 +58,21 @@ public class SrTiempoScreen extends Screen {
         context.drawText(textRenderer, "🔄 Por el momento siempre será la misma", scaledCenterX + 10, y, 0xCCCCCC, false);
         y += 14;
         context.drawText(textRenderer, "🎁 Pero en cuanto la termines te daré tu hora extra", scaledCenterX + 10, y, 0xDDDD99, false);
+
+        int yStats = y + 14;
+        context.drawText(textRenderer, "📊 Progreso de la misión diaria:", scaledCenterX + 10, yStats, 0xAAAAFF, false);
+        yStats += 14;
+        context.drawText(textRenderer, "• Zombies: " + zombies + "/10", scaledCenterX + 10, yStats, 0xFFFFFF, false);
+        yStats += 12;
+        context.drawText(textRenderer, "• Creepers: " + creepers + "/10", scaledCenterX + 10, yStats, 0xFFFFFF, false);
+        yStats += 12;
+        context.drawText(textRenderer, "• Phantoms: " + phantoms + "/10", scaledCenterX + 10, yStats, 0xFFFFFF, false);
+        yStats += 14;
+
+        if (completed) {
+            context.drawText(textRenderer, "✅ ¡Ya completaste la misión hoy!", scaledCenterX + 10, yStats, 0x00FF00, false);
+        }
+
 
         context.getMatrices().pop();
 

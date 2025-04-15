@@ -1,6 +1,7 @@
 package com.TNTStudios.tanizen.entity;
 
 import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
+import com.TNTStudios.tanizen.network.TanizenPackets;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
@@ -41,7 +42,7 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
             }
 
             data.save(serverPlayer);
-            com.TNTStudios.tanizen.network.TanizenPackets.openSrTiempoScreen(serverPlayer);
+            TanizenPackets.sendSrTiempoProgress(serverPlayer, data);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);

@@ -49,11 +49,18 @@ public class TanizenClient implements ClientModInitializer {
             });
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.OPEN_SRTIEMPO_SCREEN, (client, handler, buf, responseSender) -> {
+        ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.MISSION_PROGRESS_SRTIEMPO, (client, handler, buf, responseSender) -> {
+            int zombies = buf.readInt();
+            int creepers = buf.readInt();
+            int phantoms = buf.readInt();
+            boolean completed = buf.readBoolean();
+
             client.execute(() -> {
-                client.setScreen(new SrTiempoScreen());
+                SrTiempoScreen screen = new SrTiempoScreen(zombies, creepers, phantoms, completed);
+                client.setScreen(screen);
             });
         });
+
 
     }
 }
