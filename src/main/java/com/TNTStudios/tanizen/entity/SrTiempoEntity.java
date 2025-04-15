@@ -4,6 +4,7 @@ import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
 import com.TNTStudios.tanizen.network.TanizenPackets;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -84,8 +85,9 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        return source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY);
+        return source.isOf(DamageTypes.OUT_OF_WORLD);
     }
+
 
     @Override
     public boolean canImmediatelyDespawn(double distanceSquared) {

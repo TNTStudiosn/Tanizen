@@ -5,6 +5,7 @@ import com.TNTStudios.tanizen.network.TanizenPackets;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -148,7 +149,7 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
 
     @Override
     public boolean damage(DamageSource source, float amount) {
-        return source.isIn(DamageTypeTags.BYPASSES_INVULNERABILITY);
+        return source.isOf(DamageTypes.OUT_OF_WORLD);
     }
 
     @Override

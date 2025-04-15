@@ -41,8 +41,7 @@ public class Tanizen implements ModInitializer {
             if (now.toLocalTime().truncatedTo(ChronoUnit.MINUTES).equals(TimeLimitConfig.resetTime)) {
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     SrTiempoMissionData data = SrTiempoMissionData.load(player);
-                    data.setCompletedToday(false);
-                    data.activateMission();
+                    data.resetAll();
                     data.save(player);
                 }
             }

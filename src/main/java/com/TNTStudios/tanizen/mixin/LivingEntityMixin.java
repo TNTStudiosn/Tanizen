@@ -32,7 +32,7 @@ public class LivingEntityMixin {
             if (justCompleted && !data.isCompletedToday()) {
                 data.setCompletedToday(true);
                 PlayerTimeLimitAPI api = Playertimelimit.getAPI();
-                api.addTime(player.getUuid(), 3600); // 1 hora = 3600 segundos
+                api.addTime(player.getUuid(), 3600);
                 player.sendMessage(Text.of("§a¡Has completado la misión diaria! Se te ha añadido 1 hora."), false);
             }
 

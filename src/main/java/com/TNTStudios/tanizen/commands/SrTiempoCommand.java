@@ -21,7 +21,7 @@ public class SrTiempoCommand {
                                 .executes(ctx -> {
                                     ServerPlayerEntity player = net.minecraft.command.argument.EntityArgumentType.getPlayer(ctx, "target");
                                     SrTiempoMissionData data = SrTiempoMissionData.load(player);
-                                    data.setCompletedToday(false);
+                                    data.resetAll();
                                     data.save(player);
                                     ctx.getSource().sendFeedback(() -> Text.of("§eReiniciada misión para §b" + player.getName().getString()), false);
                                     return 1;
@@ -31,7 +31,7 @@ public class SrTiempoCommand {
                                 .executes(ctx -> {
                                     for (ServerPlayerEntity player : ctx.getSource().getServer().getPlayerManager().getPlayerList()) {
                                         SrTiempoMissionData data = SrTiempoMissionData.load(player);
-                                        data.setCompletedToday(false);
+                                        data.resetAll();
                                         data.save(player);
                                     }
                                     ctx.getSource().sendFeedback(() -> Text.of("§aSe reinició la misión para todos los jugadores conectados."), false);

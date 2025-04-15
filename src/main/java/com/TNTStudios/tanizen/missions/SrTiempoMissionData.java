@@ -105,4 +105,13 @@ public class SrTiempoMissionData {
         this.missionActivated = true;
     }
 
+    public void resetAll() {
+        this.zombiesKilled = 0;
+        this.creepersKilled = 0;
+        this.phantomsKilled = 0;
+        this.completedToday = false;
+        this.missionActivated = false;
+    }
+
+
 }
