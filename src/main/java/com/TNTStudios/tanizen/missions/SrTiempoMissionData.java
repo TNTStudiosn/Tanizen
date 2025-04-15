@@ -17,6 +17,7 @@ public class SrTiempoMissionData {
     private int creepersKilled = 0;
     private int phantomsKilled = 0;
     private boolean completedToday = false;
+    private boolean missionActivated = false;
 
     public SrTiempoMissionData(UUID uuid) {
         this.uuid = uuid;
@@ -34,6 +35,7 @@ public class SrTiempoMissionData {
                     data.creepersKilled = json.get("creepers").getAsInt();
                     data.phantomsKilled = json.get("phantoms").getAsInt();
                     data.completedToday = json.get("completedToday").getAsBoolean();
+                    data.missionActivated = json.has("missionActivated") && json.get("missionActivated").getAsBoolean();
                     return data;
                 }
             }
@@ -51,6 +53,7 @@ public class SrTiempoMissionData {
             json.addProperty("creepers", creepersKilled);
             json.addProperty("phantoms", phantomsKilled);
             json.addProperty("completedToday", completedToday);
+            json.addProperty("missionActivated", missionActivated);
 
             try (Writer writer = Files.newBufferedWriter(file)) {
                 GSON.toJson(json, writer);
@@ -92,6 +95,14 @@ public class SrTiempoMissionData {
 
     public int getPhantomsKilled() {
         return phantomsKilled;
+    }
+
+    public boolean isMissionActivated() {
+        return missionActivated;
+    }
+
+    public void activateMission() {
+        this.missionActivated = true;
     }
 
 }

@@ -34,19 +34,19 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
             SrTiempoMissionData data = SrTiempoMissionData.load(serverPlayer);
-            serverPlayer.sendMessage(Text.of("§bProgreso de la misión del día:"), false);
-            serverPlayer.sendMessage(Text.of("§7Zombies: " + data.getZombiesKilled() + "/10"), false);
-            serverPlayer.sendMessage(Text.of("§7Creepers: " + data.getCreepersKilled() + "/10"), false);
-            serverPlayer.sendMessage(Text.of("§7Phantoms: " + data.getPhantomsKilled() + "/10"), false);
 
-            if (data.isCompletedToday()) {
-                serverPlayer.sendMessage(Text.of("§aYa completaste esta misión hoy. ¡Vuelve mañana!"), false);
+            if (!data.isMissionActivated()) {
+                data.activateMission();
+                serverPlayer.sendMessage(Text.of("§e¡Misión diaria activada! Empieza a cazar."), false);
             }
 
+            data.save(serverPlayer);
+            com.TNTStudios.tanizen.network.TanizenPackets.openSrTiempoScreen(serverPlayer);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
+
 
 
 

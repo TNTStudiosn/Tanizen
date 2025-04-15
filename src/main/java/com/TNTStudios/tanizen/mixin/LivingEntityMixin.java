@@ -24,7 +24,10 @@ public class LivingEntityMixin {
 
         if (!self.getWorld().isClient) {
             SrTiempoMissionData data = SrTiempoMissionData.load(player);
+            if (!data.isMissionActivated()) return;
+
             boolean justCompleted = data.tryAddKill(self.getType());
+
 
             if (justCompleted && !data.isCompletedToday()) {
                 data.setCompletedToday(true);
