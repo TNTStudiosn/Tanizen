@@ -2,6 +2,7 @@ package com.TNTStudios.tanizen.client;
 
 import com.TNTStudios.tanizen.client.gui.SabioObsidianoScreen;
 
+import com.TNTStudios.tanizen.client.gui.SrTiempoScreen;
 import com.TNTStudios.tanizen.missions.SabioObsidianoMissionData;
 import com.TNTStudios.tanizen.network.TanizenPackets;
 import com.TNTStudios.tanizen.registry.TanizenEntities;
@@ -47,5 +48,12 @@ public class TanizenClient implements ClientModInitializer {
                 client.setScreen(new SabioObsidianoScreen());
             });
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.OPEN_SRTIEMPO_SCREEN, (client, handler, buf, responseSender) -> {
+            client.execute(() -> {
+                client.setScreen(new SrTiempoScreen());
+            });
+        });
+
     }
 }

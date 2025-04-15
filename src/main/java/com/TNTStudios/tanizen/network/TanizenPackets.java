@@ -15,6 +15,7 @@ import java.util.Map;
 public class TanizenPackets {
     public static final Identifier OPEN_DIALOG_SCREEN = new Identifier("tanizen", "open_dialog");
     public static final Identifier DELIVER_MISSION_PACKET = new Identifier("tanizen", "deliver_mission");
+    public static final Identifier OPEN_SRTIEMPO_SCREEN = new Identifier("tanizen", "open_srtiempo");
 
     public static void openDialog(ServerPlayerEntity player, SabioObsidianoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
@@ -33,4 +34,10 @@ public class TanizenPackets {
         PacketByteBuf buf = PacketByteBufs.create();
         ServerPlayNetworking.send(player, DELIVER_MISSION_PACKET, buf);
     }
+
+    public static void openSrTiempoScreen(ServerPlayerEntity player) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        ServerPlayNetworking.send(player, OPEN_SRTIEMPO_SCREEN, buf);
+    }
+
 }

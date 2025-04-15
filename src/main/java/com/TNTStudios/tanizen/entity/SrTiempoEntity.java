@@ -1,9 +1,12 @@
 package com.TNTStudios.tanizen.entity;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.registry.tag.DamageTypeTags;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -15,6 +18,7 @@ import software.bernie.geckolib.core.object.PlayState;
 import software.bernie.geckolib.util.GeckoLibUtil;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.registry.tag.DamageTypeTags;
 
 public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
 
@@ -23,6 +27,16 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
     public SrTiempoEntity(EntityType<? extends PathAwareEntity> type, World world) {
         super(type, world);
     }
+
+    @Override
+    public ActionResult interactMob(PlayerEntity player, Hand hand) {
+        if (!player.getWorld().isClient && hand == Hand.MAIN_HAND && player instanceof ServerPlayerEntity serverPlayer) {
+            com.TNTStudios.tanizen.network.TanizenPackets.openSrTiempoScreen(serverPlayer);
+            return ActionResult.SUCCESS;
+        }
+        return super.interactMob(player, hand);
+    }
+
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {

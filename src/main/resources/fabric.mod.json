@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "tanizen",
+  "version": "${version}",
+  "name": "Tanizen",
+  "description": "Mod creado para ldar informacion en discord",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/tanizen/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.TNTStudios.tanizen.client.TanizenClient"
+    ],
+    "main": [
+      "com.TNTStudios.tanizen.Tanizen"
+    ]
+  },
+  "mixins": [
+    "tanizen.mixins.json",
+    {
+      "config": "tanizen.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
