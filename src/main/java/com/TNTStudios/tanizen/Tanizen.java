@@ -1,5 +1,6 @@
 package com.TNTStudios.tanizen;
 
+import com.TNTStudios.tanizen.commands.SrTiempoCommand;
 import com.TNTStudios.tanizen.entity.SabioObsidianoEntity;
 import com.TNTStudios.tanizen.entity.SrTiempoEntity;
 import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
@@ -8,6 +9,7 @@ import com.TNTStudios.tanizen.network.TanizenPackets;
 import com.TNTStudios.tanizen.registry.TanizenEntities;
 import com.TNTStudios.tanizen.util.TimeLimitConfig;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -45,5 +47,10 @@ public class Tanizen implements ModInitializer {
                 }
             }
         });
+
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            SrTiempoCommand.register(dispatcher);
+        });
+
     }
 }
