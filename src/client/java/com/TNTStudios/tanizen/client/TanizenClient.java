@@ -52,8 +52,12 @@ public class TanizenClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(
                 TanizenPackets.OPEN_SRTIEMPO_OPTIONS,
                 (client, handler, buf, responseSender) -> {
+                    // Leemos coste e ítem
+                    int buyCost = buf.readInt();
+                    Identifier buyItem = buf.readIdentifier();
                     client.execute(() -> {
-                        client.setScreen(new OptionSelectionScreen());
+                        // Pasamos buyCost al constructor
+                        client.setScreen(new OptionSelectionScreen(buyCost, buyItem));
                     });
                 }
         );

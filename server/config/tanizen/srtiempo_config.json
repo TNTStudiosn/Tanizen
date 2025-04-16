@@ -14,7 +14,7 @@
     { "entity_type": "minecraft:zombie", "amount": 1 },
     { "entity_type": "minecraft:creeper", "amount": 1 },
     { "entity_type": "minecraft:villager", "amount": 1 },
-    { "entity_type": "minecraft:pig", "amount": 1 }
+    { "entity_type": "minecraft:pig", "amount": 5 }
   ],
   "buy_cost": 5,
   "buy_item": "bsroleplay:gold_coin"

@@ -29,63 +29,79 @@ public class SrTiempoScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
 
-        float baseScale = Math.min((float) this.width / 427f, (float) this.height / 280f);
-        float scale = baseScale * 0.75f;
-
+        // Escalado adaptativo
+        float baseScale = Math.min((float) this.width / 500f, (float) this.height / 300f);
+        float scale = baseScale * 0.85f;
         context.getMatrices().push();
-        context.getMatrices().scale(scale, scale, 1.0f);
+        context.getMatrices().scale(scale, scale, 1);
 
-        int cx = (int) ((this.width / scale - GUI_WIDTH) / 2);
-        int cy = (int) ((this.height / scale - GUI_HEIGHT) / 2);
-
+        // Panel central
+        int panelW = GUI_WIDTH;
+        int panelH = GUI_HEIGHT;
+        int x0 = (int) ((this.width / scale - panelW) / 2);
+        int y0 = (int) ((this.height / scale - panelH) / 2);
         int bgColor = 0xCC000000;
         int borderColor = 0xFF6D1B89;
 
-        context.fill(cx, cy, cx + GUI_WIDTH, cy + GUI_HEIGHT, bgColor);
-        context.drawHorizontalLine(cx, cx + GUI_WIDTH, cy, borderColor);
-        context.drawHorizontalLine(cx, cx + GUI_WIDTH, cy + GUI_HEIGHT, borderColor);
-        context.drawVerticalLine(cx, cy, cy + GUI_HEIGHT, borderColor);
-        context.drawVerticalLine(cx + GUI_WIDTH, cy, cy + GUI_HEIGHT, borderColor);
+        context.fill(x0, y0, x0 + panelW, y0 + panelH, bgColor);
+        context.drawHorizontalLine(x0, x0 + panelW, y0, borderColor);
+        context.drawHorizontalLine(x0, x0 + panelW, y0 + panelH, borderColor);
+        context.drawVerticalLine(x0, y0, y0 + panelH, borderColor);
+        context.drawVerticalLine(x0 + panelW, y0, y0 + panelH, borderColor);
 
-        int y = cy + 10;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_1", "👋 Hola buenas, soy el Sr. Tiempo"), cx + 14, y, 0xFFFFFF, false);
-        y += 16;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_2", "🕒 Si deseas que agregue 1h más a tu contador"), cx + 14, y, 0xCCCCCC, false);
-        y += 14;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_3", "📜 Deberás hacer una misión para mí"), cx + 14, y, 0xCCCCCC, false);
-        y += 14;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_4", "⏳ Esta misión solo la podrás hacer 1 sola vez al día"), cx + 14, y, 0xCCCCCC, false);
-        y += 14;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_5", "🔄 Por el momento siempre será la misma"), cx + 14, y, 0xCCCCCC, false);
-        y += 14;
-        context.drawText(textRenderer, guiText.getOrDefault("intro_6", "🎁 Pero en cuanto la termines te daré tu hora extra"), cx + 14, y, 0xDDDD99, false);
+        // Título
+        String title = guiText.getOrDefault("intro_1", "👋 Sr. Tiempo");
+        int tw = textRenderer.getWidth(title);
+        context.drawText(textRenderer, title, x0 + (panelW - tw) / 2, y0 + 10, 0xFFDD55, false);
 
-        y += 10;
-        context.drawHorizontalLine(cx + 10, cx + GUI_WIDTH - 10, y, 0x444444);
-        y += 12;
+        int y = y0 + 32;
+        // Líneas intro
+        String[] intros = {"intro_2","intro_3","intro_4","intro_5","intro_6"};
+        for (String key : intros) {
+            String line = guiText.getOrDefault(key, "");
+            context.drawText(textRenderer, line, x0 + 20, y, 0xCCCCCC, false);
+            y += 16;
+        }
 
-        context.drawText(textRenderer, guiText.getOrDefault("progress_title", "📊 Progreso de la misión diaria:"), cx + 14, y, 0xAAAAFF, false);
-        y += 16;
+        // Separador
+        context.drawHorizontalLine(x0 + 10, x0 + panelW - 10, y, 0x444444);
+        y += 14;
 
+        // Título progreso
+        String progTitle = guiText.getOrDefault("progress_title", "📊 Progreso de la misión diaria:");
+        context.drawText(textRenderer, progTitle, x0 + 20, y, 0xAAAAFF, false);
+        y += 18;
+
+        // Barras de progreso
+        int barW = panelW - 40;
+        int barH = 10;
         for (Map.Entry<Identifier, Integer> entry : targets.entrySet()) {
             Identifier id = entry.getKey();
-            int required = entry.getValue();
-            int current = kills.getOrDefault(id, 0);
+            int req = entry.getValue();
+            int cur = kills.getOrDefault(id, 0);
+            boolean done = cur >= req;
 
-            boolean done = current >= required;
-            int color = done ? 0x00FF00 : 0xFF5555;
+            // Fondo de barra
+            context.fill(x0 + 20, y, x0 + 20 + barW, y + barH, 0xAA444444);
+            // Relleno
+            int fillW = (int) ((float) cur / req * barW);
+            int fillColor = done ? 0xEE00FF00 : 0xEEFF5555;
+            context.fill(x0 + 20, y, x0 + 20 + fillW, y + barH, fillColor);
 
+            // Texto encima
             String name = Registries.ENTITY_TYPE.get(id).getName().getString();
-            context.drawText(textRenderer, "• " + name + ": " + current + " / " + required, cx + 20, y, color, false);
-            y += 12;
+            String txt = name + " " + cur + " / " + req;
+            context.drawText(textRenderer, txt, x0 + 24, y + 1, 0xFFFFFF, false);
+            y += barH + 8;
         }
 
+        // Mensaje final
         y += 6;
-        if (completed) {
-            context.drawText(textRenderer, guiText.getOrDefault("completed", "✅ ¡Ya completaste la misión hoy!"), cx + 14, y, 0x00FF00, false);
-        } else {
-            context.drawText(textRenderer, guiText.getOrDefault("not_completed", "🚀 ¡Ve a completar la misión y gana +1h!"), cx + 14, y, 0xFFFF88, false);
-        }
+        String finalMsg = completed
+                ? guiText.getOrDefault("completed", "✅ ¡Ya completaste la misión hoy!")
+                : guiText.getOrDefault("not_completed", "🚀 ¡Ve a completar la misión y gana +1h!");
+        int color = completed ? 0x00FF00 : 0xFFFF88;
+        context.drawText(textRenderer, finalMsg, x0 + 20, y, color, false);
 
         context.getMatrices().pop();
         super.render(context, mouseX, mouseY, delta);

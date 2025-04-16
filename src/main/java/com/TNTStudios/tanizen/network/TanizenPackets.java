@@ -45,10 +45,16 @@ public class TanizenPackets {
         ServerPlayNetworking.send(player, OPEN_SRTIEMPO_SCREEN, buf);
     }
 
+    // TanizenPackets.java
+
     public static void openSrTiempoOptions(ServerPlayerEntity player) {
         PacketByteBuf buf = PacketByteBufs.create();
+        // Serializamos el coste y el ítem
+        buf.writeInt(SrTiempoMissionConfig.buyCost);
+        buf.writeIdentifier(SrTiempoMissionConfig.buyItem);
         ServerPlayNetworking.send(player, OPEN_SRTIEMPO_OPTIONS, buf);
     }
+
 
     public static void sendSrTiempoProgress(ServerPlayerEntity player, SrTiempoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
