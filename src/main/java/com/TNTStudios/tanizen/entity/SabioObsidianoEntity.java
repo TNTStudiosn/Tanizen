@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -115,6 +116,22 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
         }
     }
 
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (source.isOf(DamageTypes.OUT_OF_WORLD) && amount == Float.MAX_VALUE) {
+            return super.damage(source, amount);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void kill() {
+        DamageSource outOfWorld = new DamageSource(this.getWorld().getRegistryManager()
+                .get(RegistryKeys.DAMAGE_TYPE)
+                .entryOf(DamageTypes.OUT_OF_WORLD));
+        this.damage(outOfWorld, Float.MAX_VALUE);
+    }
 
     @Override
     public boolean isAiDisabled() {
@@ -147,13 +164,12 @@ public class SabioObsidianoEntity extends PathAwareEntity implements GeoAnimatab
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.0); // no se mueve
     }
 
-    @Override
-    public boolean damage(DamageSource source, float amount) {
-        return source.isOf(DamageTypes.OUT_OF_WORLD);
-    }
 
     @Override
     public boolean canImmediatelyDespawn(double distanceSquared) {
+        if (this.isRemoved()) {
+            return true; // Permitir despawn si la entidad está marcada como eliminada
+        }
         return false;
     }
 

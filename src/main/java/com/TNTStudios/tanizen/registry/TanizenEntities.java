@@ -23,7 +23,7 @@ public class TanizenEntities {
             Registries.ENTITY_TYPE,
             new Identifier("tanizen", "srtiempo"),
             EntityType.Builder.create(SrTiempoEntity::new, SpawnGroup.CREATURE)
-                    .setDimensions(0.6f, 1.95f) // Ajusta las dimensiones si es necesario
+                    .setDimensions(1.0f, 1.5f) // ancho: 0.6 (normal), alto: 1 bloque
                     .build("srtiempo")
     );
 

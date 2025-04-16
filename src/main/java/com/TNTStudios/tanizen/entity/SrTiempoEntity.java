@@ -7,6 +7,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -49,8 +50,22 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
         return super.interactMob(player, hand);
     }
 
+    @Override
+    public boolean damage(DamageSource source, float amount) {
+        if (source.isOf(DamageTypes.OUT_OF_WORLD) && amount == Float.MAX_VALUE) {
+            return super.damage(source, amount);
+        } else {
+            return false;
+        }
+    }
 
-
+    @Override
+    public void kill() {
+        DamageSource outOfWorld = new DamageSource(this.getWorld().getRegistryManager()
+                .get(RegistryKeys.DAMAGE_TYPE)
+                .entryOf(DamageTypes.OUT_OF_WORLD));
+        this.damage(outOfWorld, Float.MAX_VALUE);
+    }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -83,14 +98,12 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
         controllerRegistrar.add(new AnimationController<>(this, "controller", 0, this::predicate));
     }
 
-    @Override
-    public boolean damage(DamageSource source, float amount) {
-        return source.isOf(DamageTypes.OUT_OF_WORLD);
-    }
-
 
     @Override
     public boolean canImmediatelyDespawn(double distanceSquared) {
+        if (this.isRemoved()) {
+            return true; // Permitir despawn si la entidad está marcada como eliminada
+        }
         return false;
     }
 }
