@@ -12,7 +12,8 @@
   },
   "targets": [
     { "entity_type": "minecraft:zombie", "amount": 1 },
-    { "entity_type": "minecraft:creeper", "amount": 2 },
-    { "entity_type": "minecraft:pig", "amount": 3 }
+    { "entity_type": "minecraft:creeper", "amount": 1 },
+    { "entity_type": "minecraft:villager", "amount": 1 },
+    { "entity_type": "minecraft:pig", "amount": 1 }
   ]
 }
