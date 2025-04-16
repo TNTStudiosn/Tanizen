@@ -21,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 import java.time.Instant;
 import java.time.LocalTime;
@@ -114,6 +115,64 @@ public class Tanizen implements ModInitializer {
                 System.out.println("[Tanizen] Misiones reiniciadas automáticamente a las " + now.toLocalTime());
             }
         });
+
+        ServerPlayNetworking.registerGlobalReceiver(
+                TanizenPackets.REQUEST_DELIVER_SRTIEMPO_ITEMS,
+                (server, player, handler, buf, responseSender) -> {
+                    server.execute(() -> {
+                        SrTiempoMissionData data = SrTiempoMissionData.load(player);
+                        if (!data.isMissionActivated() || data.isCompletedToday()) return;
+
+                        boolean anyDelivered = false;
+                        // recorremos cada objetivo de ítem
+                        for (var entry : SrTiempoMissionConfig.itemTargets.entrySet()) {
+                            Identifier id = entry.getKey();
+                            int required = entry.getValue();
+                            int already = data.getItemsDelivered().getOrDefault(id, 0);
+                            int missing = required - already;
+                            if (missing <= 0) continue;
+
+                            // contar en inventario
+                            int have = player.getInventory().main.stream()
+                                    .filter(s -> Registries.ITEM.getId(s.getItem()).equals(id))
+                                    .mapToInt(s -> s.getCount()).sum();
+                            int toTake = Math.min(have, missing);
+                            if (toTake <= 0) continue;
+
+                            // eliminar del inventario
+                            int rem = toTake;
+                            for (int i = 0; i < player.getInventory().size() && rem > 0; i++) {
+                                var stack = player.getInventory().getStack(i);
+                                if (Registries.ITEM.getId(stack.getItem()).equals(id)) {
+                                    int d = Math.min(stack.getCount(), rem);
+                                    stack.decrement(d);
+                                    rem -= d;
+                                }
+                            }
+
+                            // registrar entrega
+                            boolean justCompleted = data.tryDeliverItem(id, toTake);
+                            anyDelivered = true;
+
+                            // si completó misión con esto
+                            if (justCompleted && !data.isCompletedToday()) {
+                                data.setCompletedToday(true);
+                                Playertimelimit.getAPI().addTime(player.getUuid(), 3600);
+                                player.sendMessage(
+                                        Text.of("§6¡Misión de ítems completada! +1h extra."),
+                                        false
+                                );
+                            }
+                        }
+
+                        if (anyDelivered) {
+                            data.save(player);
+                        }
+                        // enviamos progreso actualizado
+                        TanizenPackets.sendSrTiempoProgress(player, data);
+                    });
+                }
+        );
 
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
