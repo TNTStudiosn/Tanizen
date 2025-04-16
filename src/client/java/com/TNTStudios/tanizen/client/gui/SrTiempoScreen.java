@@ -5,22 +5,21 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
 import java.util.Map;
 
 public class SrTiempoScreen extends Screen {
     private static final int GUI_WIDTH = 380;
     private static final int GUI_HEIGHT = 260;
 
-    private final int zombies, creepers, phantoms;
     private final boolean completed;
     private final Map<String, String> guiText;
     private final Map<Identifier, Integer> targets;
+    private final Map<Identifier, Integer> kills;
 
-    public SrTiempoScreen(int zombies, int creepers, int phantoms, boolean completed, Map<String, String> guiText, Map<Identifier, Integer> targets) {
+    public SrTiempoScreen(Map<Identifier, Integer> kills, boolean completed, Map<String, String> guiText, Map<Identifier, Integer> targets) {
         super(Text.of("Sr. Tiempo"));
-        this.zombies = zombies;
-        this.creepers = creepers;
-        this.phantoms = phantoms;
+        this.kills = kills;
         this.completed = completed;
         this.guiText = guiText;
         this.targets = targets;
@@ -48,7 +47,6 @@ public class SrTiempoScreen extends Screen {
         context.drawVerticalLine(cx, cy, cy + GUI_HEIGHT, borderColor);
         context.drawVerticalLine(cx + GUI_WIDTH, cy, cy + GUI_HEIGHT, borderColor);
 
-        // Sección de presentación
         int y = cy + 10;
         context.drawText(textRenderer, guiText.getOrDefault("intro_1", "👋 Hola buenas, soy el Sr. Tiempo"), cx + 14, y, 0xFFFFFF, false);
         y += 16;
@@ -62,33 +60,24 @@ public class SrTiempoScreen extends Screen {
         y += 14;
         context.drawText(textRenderer, guiText.getOrDefault("intro_6", "🎁 Pero en cuanto la termines te daré tu hora extra"), cx + 14, y, 0xDDDD99, false);
 
-        // Línea divisoria
         y += 10;
         context.drawHorizontalLine(cx + 10, cx + GUI_WIDTH - 10, y, 0x444444);
         y += 12;
 
-        // Progreso visual
         context.drawText(textRenderer, guiText.getOrDefault("progress_title", "📊 Progreso de la misión diaria:"), cx + 14, y, 0xAAAAFF, false);
         y += 16;
 
-        int index = 0;
         for (Map.Entry<Identifier, Integer> entry : targets.entrySet()) {
             Identifier id = entry.getKey();
             int required = entry.getValue();
-            int progress = switch (id.toString()) {
-                case "minecraft:zombie" -> zombies;
-                case "minecraft:creeper" -> creepers;
-                case "minecraft:phantom" -> phantoms;
-                default -> 0; // puedes añadir más si es necesario
-            };
+            int current = kills.getOrDefault(id, 0);
 
-            boolean done = progress >= required;
+            boolean done = current >= required;
             int color = done ? 0x00FF00 : 0xFF5555;
 
             String name = Registries.ENTITY_TYPE.get(id).getName().getString();
-            context.drawText(textRenderer, "• " + name + ": " + progress + " / " + required, cx + 20, y, color, false);
+            context.drawText(textRenderer, "• " + name + ": " + current + " / " + required, cx + 20, y, color, false);
             y += 12;
-            index++;
         }
 
         y += 6;
@@ -101,8 +90,6 @@ public class SrTiempoScreen extends Screen {
         context.getMatrices().pop();
         super.render(context, mouseX, mouseY, delta);
     }
-
-
 
     @Override
     public boolean shouldPause() {
