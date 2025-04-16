@@ -1,8 +1,10 @@
 package com.TNTStudios.tanizen.missions;
 
+import com.TNTStudios.tanizen.util.SrTiempoMissionConfig;
 import com.google.gson.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 
 import java.io.*;
 import java.nio.file.*;
@@ -13,9 +15,7 @@ public class SrTiempoMissionData {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final UUID uuid;
-    private int zombiesKilled = 0;
-    private int creepersKilled = 0;
-    private int phantomsKilled = 0;
+    private final Map<Identifier, Integer> kills = new HashMap<>();
     private boolean completedToday = false;
     private boolean missionActivated = false;
 
@@ -31,11 +31,18 @@ public class SrTiempoMissionData {
                 try (Reader reader = Files.newBufferedReader(file)) {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     SrTiempoMissionData data = new SrTiempoMissionData(player.getUuid());
-                    data.zombiesKilled = json.get("zombies").getAsInt();
-                    data.creepersKilled = json.get("creepers").getAsInt();
-                    data.phantomsKilled = json.get("phantoms").getAsInt();
+
+                    if (json.has("kills")) {
+                        JsonObject killsObj = json.getAsJsonObject("kills");
+                        for (Map.Entry<String, JsonElement> entry : killsObj.entrySet()) {
+                            Identifier id = new Identifier(entry.getKey());
+                            data.kills.put(id, entry.getValue().getAsInt());
+                        }
+                    }
+
                     data.completedToday = json.get("completedToday").getAsBoolean();
                     data.missionActivated = json.has("missionActivated") && json.get("missionActivated").getAsBoolean();
+
                     return data;
                 }
             }
@@ -48,12 +55,16 @@ public class SrTiempoMissionData {
             Files.createDirectories(SAVE_FOLDER);
             Path file = SAVE_FOLDER.resolve(uuid.toString() + "_srtiempo.json");
             JsonObject json = new JsonObject();
+
             json.addProperty("uuid", uuid.toString());
-            json.addProperty("zombies", zombiesKilled);
-            json.addProperty("creepers", creepersKilled);
-            json.addProperty("phantoms", phantomsKilled);
             json.addProperty("completedToday", completedToday);
             json.addProperty("missionActivated", missionActivated);
+
+            JsonObject killsObj = new JsonObject();
+            for (Map.Entry<Identifier, Integer> e : kills.entrySet()) {
+                killsObj.addProperty(e.getKey().toString(), e.getValue());
+            }
+            json.add("kills", killsObj);
 
             try (Writer writer = Files.newBufferedWriter(file)) {
                 GSON.toJson(json, writer);
@@ -66,35 +77,35 @@ public class SrTiempoMissionData {
     public boolean tryAddKill(EntityType<?> type) {
         if (completedToday) return false;
 
-        if (type == EntityType.ZOMBIE && zombiesKilled < 10) zombiesKilled++;
-        else if (type == EntityType.CREEPER && creepersKilled < 10) creepersKilled++;
-        else if (type == EntityType.PHANTOM && phantomsKilled < 10) phantomsKilled++;
+        Identifier id = EntityType.getId(type);
+        int required = SrTiempoMissionConfig.mobTargets.getOrDefault(id, -1);
+        if (required <= 0) return false;
 
+        int current = kills.getOrDefault(id, 0);
+        if (current >= required) return false;
+
+        kills.put(id, current + 1);
         return isCompleted();
     }
 
     public boolean isCompleted() {
-        return zombiesKilled >= 10 && creepersKilled >= 10 && phantomsKilled >= 10;
+        for (Map.Entry<Identifier, Integer> entry : SrTiempoMissionConfig.mobTargets.entrySet()) {
+            int current = kills.getOrDefault(entry.getKey(), 0);
+            if (current < entry.getValue()) return false;
+        }
+        return true;
     }
 
-    public void setCompletedToday(boolean completedToday) {
-        this.completedToday = completedToday;
+    public Map<Identifier, Integer> getKills() {
+        return kills;
     }
 
     public boolean isCompletedToday() {
         return completedToday;
     }
 
-    public int getZombiesKilled() {
-        return zombiesKilled;
-    }
-
-    public int getCreepersKilled() {
-        return creepersKilled;
-    }
-
-    public int getPhantomsKilled() {
-        return phantomsKilled;
+    public void setCompletedToday(boolean completedToday) {
+        this.completedToday = completedToday;
     }
 
     public boolean isMissionActivated() {
@@ -106,12 +117,8 @@ public class SrTiempoMissionData {
     }
 
     public void resetAll() {
-        this.zombiesKilled = 0;
-        this.creepersKilled = 0;
-        this.phantomsKilled = 0;
+        this.kills.clear();
         this.completedToday = false;
         this.missionActivated = false;
     }
-
-
 }
