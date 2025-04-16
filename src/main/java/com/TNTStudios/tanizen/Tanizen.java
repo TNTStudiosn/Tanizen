@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class Tanizen implements ModInitializer {
+    private static int lastResetDay = -1;
 
     @Override
     public void onInitialize() {
@@ -38,14 +39,19 @@ public class Tanizen implements ModInitializer {
             long current = System.currentTimeMillis();
             ZonedDateTime now = ZonedDateTime.ofInstant(Instant.ofEpochMilli(current), TimeLimitConfig.resetZone);
 
-            if (now.toLocalTime().truncatedTo(ChronoUnit.MINUTES).equals(TimeLimitConfig.resetTime)) {
+            // Condición de reinicio: hora pasada y día no igual al último reiniciado
+            if (now.toLocalTime().isAfter(TimeLimitConfig.resetTime) && now.getDayOfYear() != lastResetDay) {
+                lastResetDay = now.getDayOfYear();
+
                 for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                     SrTiempoMissionData data = SrTiempoMissionData.load(player);
                     data.resetAll();
                     data.save(player);
                 }
+                System.out.println("[Tanizen] Misiones reiniciadas automáticamente a las " + now.toLocalTime());
             }
         });
+
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             SrTiempoCommand.register(dispatcher);
