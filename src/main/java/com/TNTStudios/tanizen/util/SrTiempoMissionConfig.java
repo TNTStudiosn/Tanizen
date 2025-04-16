@@ -15,6 +15,10 @@ public class SrTiempoMissionConfig {
     public static Map<Identifier, Integer> mobTargets = new LinkedHashMap<>();
     public static Map<String, String> guiText = new HashMap<>();
 
+    // Configuración de compra
+    public static int buyCost = 1;  //Costo por defecto si no está en JSON
+    public static Identifier buyItem = new Identifier("bsroleplay", "gold_coin"); //Ítem por defecto
+
     public static void load() {
         mobTargets.clear();
         guiText.clear();
@@ -22,6 +26,7 @@ public class SrTiempoMissionConfig {
         try (Reader reader = new FileReader(CONFIG_PATH.toFile())) {
             JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
 
+            // Cargar objetivos de mobs
             JsonArray targets = json.getAsJsonArray("targets");
             for (JsonElement el : targets) {
                 JsonObject obj = el.getAsJsonObject();
@@ -32,9 +37,18 @@ public class SrTiempoMissionConfig {
                 }
             }
 
+            // Cargar textos de GUI
             JsonObject gui = json.getAsJsonObject("gui_text");
             for (Map.Entry<String, JsonElement> entry : gui.entrySet()) {
                 guiText.put(entry.getKey(), entry.getValue().getAsString());
+            }
+
+            // Cargar configuración de compra
+            if (json.has("buy_cost")) {
+                buyCost = json.get("buy_cost").getAsInt();
+            }
+            if (json.has("buy_item")) {
+                buyItem = new Identifier(json.get("buy_item").getAsString());
             }
 
         } catch (Exception e) {

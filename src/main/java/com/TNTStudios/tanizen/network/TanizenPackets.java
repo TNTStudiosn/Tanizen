@@ -18,6 +18,9 @@ public class TanizenPackets {
     public static final Identifier DELIVER_MISSION_PACKET = new Identifier("tanizen", "deliver_mission");
     public static final Identifier OPEN_SRTIEMPO_SCREEN = new Identifier("tanizen", "open_srtiempo");
     public static final Identifier MISSION_PROGRESS_SRTIEMPO = new Identifier("tanizen", "srtiempo_progress");
+    public static final Identifier OPEN_SRTIEMPO_OPTIONS    = new Identifier("tanizen", "open_srtiempo_options");
+    public static final Identifier REQUEST_START_SRTIEMPO    = new Identifier("tanizen", "request_start_srtiempo");
+    public static final Identifier REQUEST_BUY_HOUR          = new Identifier("tanizen", "request_buy_hour");
 
     public static void openDialog(ServerPlayerEntity player, SabioObsidianoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
@@ -40,6 +43,11 @@ public class TanizenPackets {
     public static void openSrTiempoScreen(ServerPlayerEntity player) {
         PacketByteBuf buf = PacketByteBufs.create();
         ServerPlayNetworking.send(player, OPEN_SRTIEMPO_SCREEN, buf);
+    }
+
+    public static void openSrTiempoOptions(ServerPlayerEntity player) {
+        PacketByteBuf buf = PacketByteBufs.create();
+        ServerPlayNetworking.send(player, OPEN_SRTIEMPO_OPTIONS, buf);
     }
 
     public static void sendSrTiempoProgress(ServerPlayerEntity player, SrTiempoMissionData data) {

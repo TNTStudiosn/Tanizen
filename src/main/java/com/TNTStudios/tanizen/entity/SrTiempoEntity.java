@@ -33,22 +33,22 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
         super(type, world);
     }
 
+
     @Override
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
             SrTiempoMissionData data = SrTiempoMissionData.load(serverPlayer);
-
-            if (!data.isMissionActivated()) {
-                data.activateMission();
-                serverPlayer.sendMessage(Text.of("§e¡Misión diaria activada! Empieza a cazar."), false);
+            if (data.isCompletedToday()) {
+                serverPlayer.sendMessage(Text.of("§cYa has obtenido tu hora por hoy. Vuelve mañana."), false);
+                return ActionResult.SUCCESS;
             }
-
-            data.save(serverPlayer);
-            TanizenPackets.sendSrTiempoProgress(serverPlayer, data);
+            // En lugar de activar misión aquí, abrimos primero el menú de opciones
+            TanizenPackets.openSrTiempoOptions(serverPlayer);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
+
 
     @Override
     public boolean damage(DamageSource source, float amount) {

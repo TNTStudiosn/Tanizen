@@ -1,6 +1,7 @@
 package com.TNTStudios.tanizen.client;
 
 import com.TNTStudios.tanizen.client.discord.DiscordPresenceHandler;
+import com.TNTStudios.tanizen.client.gui.OptionSelectionScreen;
 import com.TNTStudios.tanizen.client.gui.SabioObsidianoScreen;
 import com.TNTStudios.tanizen.client.gui.SrTiempoScreen;
 import com.TNTStudios.tanizen.client.renderer.SabioObsidianoRenderer;
@@ -47,6 +48,15 @@ public class TanizenClient implements ClientModInitializer {
                 client.setScreen(new SabioObsidianoScreen());
             });
         });
+
+        ClientPlayNetworking.registerGlobalReceiver(
+                TanizenPackets.OPEN_SRTIEMPO_OPTIONS,
+                (client, handler, buf, responseSender) -> {
+                    client.execute(() -> {
+                        client.setScreen(new OptionSelectionScreen());
+                    });
+                }
+        );
 
         // Sr. Tiempo Packet
         ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.MISSION_PROGRESS_SRTIEMPO, (client, handler, buf, responseSender) -> {

@@ -4,7 +4,7 @@
     "intro_2": "🕒 Si deseas que agregue 1h más a tu contador",
     "intro_3": "📜 Deberás hacer una misión para mí",
     "intro_4": "⏳ Esta misión solo la podrás hacer 1 sola vez al día",
-    "intro_5": "🔄 Siempre tendras que venir a activar la mision",
+    "intro_5": "🔄 Siempre tendrás que venir a activar la misión",
     "intro_6": "🎁 Pero en cuanto la termines te daré tu hora extra",
     "progress_title": "📊 Progreso de la misión diaria:",
     "completed": "✅ ¡Ya completaste la misión hoy!",
@@ -15,5 +15,7 @@
     { "entity_type": "minecraft:creeper", "amount": 1 },
     { "entity_type": "minecraft:villager", "amount": 1 },
     { "entity_type": "minecraft:pig", "amount": 1 }
-  ]
+  ],
+  "buy_cost": 5,
+  "buy_item": "bsroleplay:gold_coin"
 }

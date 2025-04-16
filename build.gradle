@@ -47,6 +47,10 @@ dependencies {
     modImplementation "curse.maven:playerstimelimit-1235362:6384019"
     modImplementation "curse.maven:luckperms-431733:4738951"
     implementation 'org.yaml:snakeyaml:1.33'
+
+    modImplementation "curse.maven:cloth-config-348521:5729104"
+    modImplementation "curse.maven:geckolib-388172:6333466"
+    modImplementation "curse.maven:architectury-api-419699:5137936"
 }
 
 processResources {
