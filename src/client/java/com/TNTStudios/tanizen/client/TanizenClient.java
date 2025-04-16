@@ -14,8 +14,10 @@ import com.TNTStudios.tanizen.client.renderer.SabioObsidianoRenderer;
 import com.TNTStudios.tanizen.client.renderer.SrTiempoRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
+import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -55,11 +57,23 @@ public class TanizenClient implements ClientModInitializer {
             int phantoms = buf.readInt();
             boolean completed = buf.readBoolean();
 
+            int guiSize = buf.readInt();
+            Map<String, String> guiText = new HashMap<>();
+            for (int i = 0; i < guiSize; i++) {
+                guiText.put(buf.readString(), buf.readString());
+            }
+
+            int targetSize = buf.readInt();
+            Map<Identifier, Integer> targets = new LinkedHashMap<>();
+            for (int i = 0; i < targetSize; i++) {
+                targets.put(buf.readIdentifier(), buf.readInt());
+            }
+
             client.execute(() -> {
-                SrTiempoScreen screen = new SrTiempoScreen(zombies, creepers, phantoms, completed);
-                client.setScreen(screen);
+                client.setScreen(new SrTiempoScreen(zombies, creepers, phantoms, completed, guiText, targets));
             });
         });
+
 
 
     }

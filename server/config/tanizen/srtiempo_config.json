@@ -1,0 +1,18 @@
+{
+  "gui_text": {
+    "intro_1": "👋 Hola buenas, soy el Sr. Tiempo",
+    "intro_2": "🕒 Si deseas que agregue 1h más a tu contador",
+    "intro_3": "📜 Deberás hacer una misión para mí",
+    "intro_4": "⏳ Esta misión solo la podrás hacer 1 sola vez al día",
+    "intro_5": "🔄 Siempre tendras que venir a activar la mision",
+    "intro_6": "🎁 Pero en cuanto la termines te daré tu hora extra",
+    "progress_title": "📊 Progreso de la misión diaria:",
+    "completed": "✅ ¡Ya completaste la misión hoy!",
+    "not_completed": "🚀 ¡Ve a completar la misión y gana +1h!"
+  },
+  "targets": [
+    { "entity_type": "minecraft:zombie", "amount": 1 },
+    { "entity_type": "minecraft:creeper", "amount": 2 },
+    { "entity_type": "minecraft:pig", "amount": 3 }
+  ]
+}

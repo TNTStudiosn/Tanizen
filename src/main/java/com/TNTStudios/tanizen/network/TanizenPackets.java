@@ -2,6 +2,7 @@ package com.TNTStudios.tanizen.network;
 
 import com.TNTStudios.tanizen.missions.SabioObsidianoMissionData;
 import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
+import com.TNTStudios.tanizen.util.SrTiempoMissionConfig;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.Item;
@@ -45,13 +46,30 @@ public class TanizenPackets {
 
     public static void sendSrTiempoProgress(ServerPlayerEntity player, SrTiempoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
+
+        // Progreso
         buf.writeInt(data.getZombiesKilled());
         buf.writeInt(data.getCreepersKilled());
         buf.writeInt(data.getPhantomsKilled());
         buf.writeBoolean(data.isCompletedToday());
 
+        // Textos GUI
+        Map<String, String> gui = SrTiempoMissionConfig.guiText;
+        buf.writeInt(gui.size());
+        gui.forEach((key, value) -> {
+            buf.writeString(key);
+            buf.writeString(value);
+        });
+
+        // Objetivos de mobs
+        Map<Identifier, Integer> mobs = SrTiempoMissionConfig.mobTargets;
+        buf.writeInt(mobs.size());
+        mobs.forEach((id, amount) -> {
+            buf.writeIdentifier(id);
+            buf.writeInt(amount);
+        });
+
         ServerPlayNetworking.send(player, MISSION_PROGRESS_SRTIEMPO, buf);
     }
-
 
 }

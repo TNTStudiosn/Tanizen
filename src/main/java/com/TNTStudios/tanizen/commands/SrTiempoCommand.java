@@ -39,33 +39,33 @@ public class SrTiempoCommand {
                                     return 1;
                                 })
                         )
-                        .then(CommandManager.literal("reload")
-                                .executes(ctx -> {
-                                    SrTiempoMissionConfig.load();
+                )
+                .then(CommandManager.literal("reload")
+                        .executes(ctx -> {
+                            SrTiempoMissionConfig.load();
 
-                                    // Resetear a todos
-                                    for (ServerPlayerEntity player : ctx.getSource().getServer().getPlayerManager().getPlayerList()) {
-                                        SrTiempoMissionData data = SrTiempoMissionData.load(player);
-                                        data.resetAll();
-                                        data.save(player);
-                                    }
+                            // Resetear a todos
+                            for (ServerPlayerEntity player : ctx.getSource().getServer().getPlayerManager().getPlayerList()) {
+                                SrTiempoMissionData data = SrTiempoMissionData.load(player);
+                                data.resetAll();
+                                data.save(player);
+                            }
 
-                                    // Borrar offline
-                                    try {
-                                        Path folder = Paths.get("config", "tanizen", "srtiempo_missions");
-                                        if (Files.exists(folder)) {
-                                            Files.list(folder).filter(f -> f.toString().endsWith(".json")).forEach(f -> {
-                                                try { Files.delete(f); } catch (Exception ignored) {}
-                                            });
-                                        }
-                                    } catch (Exception e) {
-                                        System.err.println("[TaniMod] No se pudieron limpiar los datos offline: " + e.getMessage());
-                                    }
+                            // Borrar offline
+                            try {
+                                Path folder = Paths.get("config", "tanizen", "srtiempo_missions");
+                                if (Files.exists(folder)) {
+                                    Files.list(folder).filter(f -> f.toString().endsWith(".json")).forEach(f -> {
+                                        try { Files.delete(f); } catch (Exception ignored) {}
+                                    });
+                                }
+                            } catch (Exception e) {
+                                System.err.println("[TaniMod] No se pudieron limpiar los datos offline: " + e.getMessage());
+                            }
 
-                                    ctx.getSource().sendFeedback(() -> Text.of("§a[TaniMod] Misión recargada y reiniciada para todos."), true);
-                                    return 1;
-                                })
-                        )
+                            ctx.getSource().sendFeedback(() -> Text.of("§a[TaniMod] Misión recargada y reiniciada para todos."), true);
+                            return 1;
+                        })
                 )
         );
     }
