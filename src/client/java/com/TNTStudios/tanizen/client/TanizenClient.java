@@ -63,35 +63,63 @@ public class TanizenClient implements ClientModInitializer {
         );
 
         // Sr. Tiempo Packet
-        ClientPlayNetworking.registerGlobalReceiver(TanizenPackets.MISSION_PROGRESS_SRTIEMPO, (client, handler, buf, responseSender) -> {
-            // Leer kills por mob
-            int killsSize = buf.readInt();
-            Map<Identifier, Integer> kills = new HashMap<>();
-            for (int i = 0; i < killsSize; i++) {
-                Identifier id = buf.readIdentifier();
-                int amount = buf.readInt();
-                kills.put(id, amount);
-            }
+        ClientPlayNetworking.registerGlobalReceiver(
+                TanizenPackets.MISSION_PROGRESS_SRTIEMPO,
+                (client, handler, buf, responseSender) -> {
+                    // 1️⃣ Leer kills (muertes)
+                    int killsSize = buf.readInt();
+                    Map<Identifier, Integer> kills = new LinkedHashMap<>();
+                    for (int i = 0; i < killsSize; i++) {
+                        Identifier id = buf.readIdentifier();
+                        int amount = buf.readInt();
+                        kills.put(id, amount);
+                    }
 
-            boolean completed = buf.readBoolean();
+                    // 2️⃣ Leer deliveredItems (entregas de ítems)
+                    int deliveredSize = buf.readInt();
+                    Map<Identifier, Integer> delivered = new LinkedHashMap<>();
+                    for (int i = 0; i < deliveredSize; i++) {
+                        Identifier id = buf.readIdentifier();
+                        int amount = buf.readInt();
+                        delivered.put(id, amount);
+                    }
 
-            // Textos GUI
-            int guiSize = buf.readInt();
-            Map<String, String> guiText = new HashMap<>();
-            for (int i = 0; i < guiSize; i++) {
-                guiText.put(buf.readString(), buf.readString());
-            }
+                    // 3️⃣ Estado completado hoy
+                    boolean completed = buf.readBoolean();
 
-            // Objetivos
-            int targetSize = buf.readInt();
-            Map<Identifier, Integer> targets = new LinkedHashMap<>();
-            for (int i = 0; i < targetSize; i++) {
-                targets.put(buf.readIdentifier(), buf.readInt());
-            }
+                    // 4️⃣ Textos de la GUI
+                    int guiSize = buf.readInt();
+                    Map<String, String> guiText = new HashMap<>();
+                    for (int i = 0; i < guiSize; i++) {
+                        guiText.put(buf.readString(), buf.readString());
+                    }
 
-            client.execute(() -> {
-                client.setScreen(new SrTiempoScreen(kills, completed, guiText, targets));
-            });
-        });
+                    // 5️⃣ Objetivos de mobs
+                    int mobTargetSize = buf.readInt();
+                    Map<Identifier, Integer> mobTargets = new LinkedHashMap<>();
+                    for (int i = 0; i < mobTargetSize; i++) {
+                        mobTargets.put(buf.readIdentifier(), buf.readInt());
+                    }
+
+                    // 6️⃣ Objetivos de ítems
+                    int itemTargetSize = buf.readInt();
+                    Map<Identifier, Integer> itemTargets = new LinkedHashMap<>();
+                    for (int i = 0; i < itemTargetSize; i++) {
+                        itemTargets.put(buf.readIdentifier(), buf.readInt());
+                    }
+
+                    // Mostrar pantalla con el nuevo constructor
+                    client.execute(() -> {
+                        client.setScreen(new SrTiempoScreen(
+                                kills,
+                                delivered,
+                                completed,
+                                guiText,
+                                mobTargets,
+                                itemTargets
+                        ));
+                    });
+                }
+        );
     }
 }

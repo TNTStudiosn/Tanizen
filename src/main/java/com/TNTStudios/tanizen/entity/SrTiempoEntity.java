@@ -1,17 +1,22 @@
 package com.TNTStudios.tanizen.entity;
 
+import com.TNTStudios.playertimelimit.Playertimelimit;
 import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
 import com.TNTStudios.tanizen.network.TanizenPackets;
+import com.TNTStudios.tanizen.util.SrTiempoMissionConfig;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -38,16 +43,46 @@ public class SrTiempoEntity extends PathAwareEntity implements GeoAnimatable {
     public ActionResult interactMob(PlayerEntity player, Hand hand) {
         if (!player.getWorld().isClient && player instanceof ServerPlayerEntity serverPlayer) {
             SrTiempoMissionData data = SrTiempoMissionData.load(serverPlayer);
+
+            // 1️⃣ Si ya completó hoy, avisar y salir
             if (data.isCompletedToday()) {
                 serverPlayer.sendMessage(Text.of("§cYa has obtenido tu hora por hoy. Vuelve mañana."), false);
                 return ActionResult.SUCCESS;
             }
-            // En lugar de activar misión aquí, abrimos primero el menú de opciones
+
+            // 2️⃣ Procesar entrega de ítems si sostiene uno de los objetivos
+            ItemStack stack = serverPlayer.getMainHandStack();
+            Identifier held = Registries.ITEM.getId(stack.getItem());
+            if (stack.getCount() > 0 && SrTiempoMissionConfig.itemTargets.containsKey(held)) {
+                int amount = stack.getCount();
+                boolean justCompleted = data.tryDeliverItem(held, amount);
+                stack.decrement(amount);
+                data.save(serverPlayer);
+
+                // Actualizar cliente y notificar entrega
+                TanizenPackets.sendSrTiempoProgress(serverPlayer, data);
+                serverPlayer.sendMessage(
+                        Text.of("§aEntregaste " + amount + "x " + stack.getItem().getName().getString()),
+                        false
+                );
+
+                // Si con esta entrega completó la misión, dar la hora
+                if (justCompleted && !data.isCompletedToday()) {
+                    data.setCompletedToday(true);
+                    Playertimelimit.getAPI().addTime(serverPlayer.getUuid(), 3600);
+                    serverPlayer.sendMessage(Text.of("§6¡Misión completada y recibiste 1h!"), false);
+                    data.save(serverPlayer);
+                }
+                return ActionResult.SUCCESS;
+            }
+
+            // 3️⃣ Si no entregó ítems, abrimos el menú de opciones
             TanizenPackets.openSrTiempoOptions(serverPlayer);
             return ActionResult.SUCCESS;
         }
         return super.interactMob(player, hand);
     }
+
 
 
     @Override

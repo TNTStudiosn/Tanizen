@@ -14,13 +14,14 @@ public class SrTiempoMissionConfig {
 
     public static Map<Identifier, Integer> mobTargets = new LinkedHashMap<>();
     public static Map<String, String> guiText = new HashMap<>();
-
+    public static Map<Identifier,Integer> itemTargets = new LinkedHashMap<>();
     // Configuración de compra
     public static int buyCost = 1;  //Costo por defecto si no está en JSON
     public static Identifier buyItem = new Identifier("bsroleplay", "gold_coin"); //Ítem por defecto
 
     public static void load() {
         mobTargets.clear();
+        itemTargets.clear();
         guiText.clear();
 
         try (Reader reader = new FileReader(CONFIG_PATH.toFile())) {
@@ -49,6 +50,17 @@ public class SrTiempoMissionConfig {
             }
             if (json.has("buy_item")) {
                 buyItem = new Identifier(json.get("buy_item").getAsString());
+            }
+
+            // + parsear item_targets
+            if (json.has("item_targets")) {
+                JsonArray items = json.getAsJsonArray("item_targets");
+                for (JsonElement el : items) {
+                    JsonObject obj = el.getAsJsonObject();
+                    Identifier id = new Identifier(obj.get("item").getAsString());
+                    int amt = obj.get("amount").getAsInt();
+                    itemTargets.put(id, amt);
+                }
             }
 
         } catch (Exception e) {

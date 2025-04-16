@@ -16,6 +16,7 @@ public class SrTiempoMissionData {
 
     private final UUID uuid;
     private final Map<Identifier, Integer> kills = new HashMap<>();
+    private final Map<Identifier, Integer> itemsDelivered = new HashMap<>();
     private boolean completedToday = false;
     private boolean missionActivated = false;
 
@@ -32,6 +33,7 @@ public class SrTiempoMissionData {
                     JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
                     SrTiempoMissionData data = new SrTiempoMissionData(player.getUuid());
 
+                    // Cargar kills (mobs)
                     if (json.has("kills")) {
                         JsonObject killsObj = json.getAsJsonObject("kills");
                         for (Map.Entry<String, JsonElement> entry : killsObj.entrySet()) {
@@ -40,8 +42,19 @@ public class SrTiempoMissionData {
                         }
                     }
 
+                    // Cargar deliveredItems (entregas de ítems)
+                    if (json.has("deliveredItems")) {
+                        JsonObject itemsObj = json.getAsJsonObject("deliveredItems");
+                        for (Map.Entry<String, JsonElement> entry : itemsObj.entrySet()) {
+                            Identifier id = new Identifier(entry.getKey());
+                            data.itemsDelivered.put(id, entry.getValue().getAsInt());
+                        }
+                    }
+
+                    // Estado de la misión
                     data.completedToday = json.get("completedToday").getAsBoolean();
-                    data.missionActivated = json.has("missionActivated") && json.get("missionActivated").getAsBoolean();
+                    data.missionActivated = json.has("missionActivated")
+                            && json.get("missionActivated").getAsBoolean();
 
                     return data;
                 }
@@ -60,11 +73,19 @@ public class SrTiempoMissionData {
             json.addProperty("completedToday", completedToday);
             json.addProperty("missionActivated", missionActivated);
 
+            // Guardar kills (mobs)
             JsonObject killsObj = new JsonObject();
             for (Map.Entry<Identifier, Integer> e : kills.entrySet()) {
                 killsObj.addProperty(e.getKey().toString(), e.getValue());
             }
             json.add("kills", killsObj);
+
+            // Guardar deliveredItems (entregas de ítems)
+            JsonObject itemsObj = new JsonObject();
+            for (Map.Entry<Identifier, Integer> e : itemsDelivered.entrySet()) {
+                itemsObj.addProperty(e.getKey().toString(), e.getValue());
+            }
+            json.add("deliveredItems", itemsObj);
 
             try (Writer writer = Files.newBufferedWriter(file)) {
                 GSON.toJson(json, writer);
@@ -88,16 +109,42 @@ public class SrTiempoMissionData {
         return isCompleted();
     }
 
+    public boolean tryDeliverItem(Identifier itemId, int amount) {
+        if (completedToday) return false;
+
+        int required = SrTiempoMissionConfig.itemTargets.getOrDefault(itemId, -1);
+        if (required <= 0) return false;
+
+        int current = itemsDelivered.getOrDefault(itemId, 0);
+        if (current >= required) return false;
+
+        int toAdd = Math.min(required - current, amount);
+        itemsDelivered.put(itemId, current + toAdd);
+        return isCompleted();
+    }
+
     public boolean isCompleted() {
+        // Verificar mobs
         for (Map.Entry<Identifier, Integer> entry : SrTiempoMissionConfig.mobTargets.entrySet()) {
-            int current = kills.getOrDefault(entry.getKey(), 0);
-            if (current < entry.getValue()) return false;
+            if (kills.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
+                return false;
+            }
+        }
+        // Verificar ítems
+        for (Map.Entry<Identifier, Integer> entry : SrTiempoMissionConfig.itemTargets.entrySet()) {
+            if (itemsDelivered.getOrDefault(entry.getKey(), 0) < entry.getValue()) {
+                return false;
+            }
         }
         return true;
     }
 
     public Map<Identifier, Integer> getKills() {
         return kills;
+    }
+
+    public Map<Identifier, Integer> getItemsDelivered() {
+        return itemsDelivered;
     }
 
     public boolean isCompletedToday() {
@@ -118,6 +165,7 @@ public class SrTiempoMissionData {
 
     public void resetAll() {
         this.kills.clear();
+        this.itemsDelivered.clear();
         this.completedToday = false;
         this.missionActivated = false;
     }

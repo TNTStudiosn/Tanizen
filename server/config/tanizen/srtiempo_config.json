@@ -11,10 +11,14 @@
     "not_completed": "🚀 ¡Ve a completar la misión y gana +1h!"
   },
   "targets": [
-    { "entity_type": "minecraft:zombie", "amount": 3 },
-    { "entity_type": "minecraft:creeper", "amount": 1 },
+    { "entity_type": "minecraft:zombie",   "amount": 3 },
+    { "entity_type": "minecraft:creeper",  "amount": 1 },
     { "entity_type": "minecraft:villager", "amount": 1 },
-    { "entity_type": "minecraft:pig", "amount": 1 }
+    { "entity_type": "minecraft:pig",      "amount": 1 }
+  ],
+  "item_targets": [
+    { "item": "minecraft:iron_ingot", "amount": 10 },
+    { "item": "minecraft:diamond",    "amount": 2 }
   ],
   "buy_cost": 5,
   "buy_item": "bsroleplay:gold_coin"

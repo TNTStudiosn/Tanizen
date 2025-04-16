@@ -59,7 +59,7 @@ public class TanizenPackets {
     public static void sendSrTiempoProgress(ServerPlayerEntity player, SrTiempoMissionData data) {
         PacketByteBuf buf = PacketByteBufs.create();
 
-        // Nuevo: kills por Identifier
+        // 1️⃣ Progreso de muertes (kills)
         Map<Identifier, Integer> kills = data.getKills();
         buf.writeInt(kills.size());
         for (Map.Entry<Identifier, Integer> entry : kills.entrySet()) {
@@ -67,10 +67,18 @@ public class TanizenPackets {
             buf.writeInt(entry.getValue());
         }
 
-        // Estado completado
+        // 2️⃣ Progreso de entregas de ítems
+        Map<Identifier, Integer> delivered = data.getItemsDelivered();
+        buf.writeInt(delivered.size());
+        for (Map.Entry<Identifier, Integer> entry : delivered.entrySet()) {
+            buf.writeIdentifier(entry.getKey());
+            buf.writeInt(entry.getValue());
+        }
+
+        // 3️⃣ Estado completado hoy
         buf.writeBoolean(data.isCompletedToday());
 
-        // Textos GUI
+        // 4️⃣ Textos de la GUI
         Map<String, String> gui = SrTiempoMissionConfig.guiText;
         buf.writeInt(gui.size());
         gui.forEach((key, value) -> {
@@ -78,14 +86,24 @@ public class TanizenPackets {
             buf.writeString(value);
         });
 
-        // Objetivos de mobs
-        Map<Identifier, Integer> mobs = SrTiempoMissionConfig.mobTargets;
-        buf.writeInt(mobs.size());
-        mobs.forEach((id, amount) -> {
+        // 5️⃣ Objetivos de mobs
+        Map<Identifier, Integer> mobTargets = SrTiempoMissionConfig.mobTargets;
+        buf.writeInt(mobTargets.size());
+        mobTargets.forEach((id, amount) -> {
             buf.writeIdentifier(id);
             buf.writeInt(amount);
         });
 
+        // 6️⃣ Objetivos de ítems
+        Map<Identifier, Integer> itemTargets = SrTiempoMissionConfig.itemTargets;
+        buf.writeInt(itemTargets.size());
+        itemTargets.forEach((id, amount) -> {
+            buf.writeIdentifier(id);
+            buf.writeInt(amount);
+        });
+
+        // Enviar paquete
         ServerPlayNetworking.send(player, MISSION_PROGRESS_SRTIEMPO, buf);
     }
+
 }
