@@ -1,6 +1,7 @@
 package com.TNTStudios.tanizen.commands;
 
 import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
+import com.TNTStudios.tanizen.util.SrTiempoMissionConfig;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -35,6 +36,33 @@ public class SrTiempoCommand {
                                         data.save(player);
                                     }
                                     ctx.getSource().sendFeedback(() -> Text.of("§aSe reinició la misión para todos los jugadores conectados."), false);
+                                    return 1;
+                                })
+                        )
+                        .then(CommandManager.literal("reload")
+                                .executes(ctx -> {
+                                    SrTiempoMissionConfig.load();
+
+                                    // Resetear a todos
+                                    for (ServerPlayerEntity player : ctx.getSource().getServer().getPlayerManager().getPlayerList()) {
+                                        SrTiempoMissionData data = SrTiempoMissionData.load(player);
+                                        data.resetAll();
+                                        data.save(player);
+                                    }
+
+                                    // Borrar offline
+                                    try {
+                                        Path folder = Paths.get("config", "tanizen", "srtiempo_missions");
+                                        if (Files.exists(folder)) {
+                                            Files.list(folder).filter(f -> f.toString().endsWith(".json")).forEach(f -> {
+                                                try { Files.delete(f); } catch (Exception ignored) {}
+                                            });
+                                        }
+                                    } catch (Exception e) {
+                                        System.err.println("[TaniMod] No se pudieron limpiar los datos offline: " + e.getMessage());
+                                    }
+
+                                    ctx.getSource().sendFeedback(() -> Text.of("§a[TaniMod] Misión recargada y reiniciada para todos."), true);
                                     return 1;
                                 })
                         )

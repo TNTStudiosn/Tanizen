@@ -7,6 +7,7 @@ import com.TNTStudios.tanizen.missions.SrTiempoMissionData;
 import com.TNTStudios.tanizen.network.DeliverMissionPacket;
 import com.TNTStudios.tanizen.network.TanizenPackets;
 import com.TNTStudios.tanizen.registry.TanizenEntities;
+import com.TNTStudios.tanizen.util.SrTiempoMissionConfig;
 import com.TNTStudios.tanizen.util.TimeLimitConfig;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -26,6 +27,7 @@ public class Tanizen implements ModInitializer {
 
     @Override
     public void onInitialize() {
+        SrTiempoMissionConfig.load();
         TimeLimitConfig.load();
         TanizenEntities.register();
         FabricDefaultAttributeRegistry.register(TanizenEntities.SABIO_OBSIDIANO, SabioObsidianoEntity.createAttributes());
