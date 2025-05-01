@@ -145,17 +145,21 @@ public class SrTiempoScreen extends Screen {
             int req = entry.getValue();
             int cur = itemsDelivered.getOrDefault(id, 0);
             boolean done = cur >= req;
+
             Item item = Registries.ITEM.get(id);
-            context.drawItem(new ItemStack(item), startX, y);
-            context.drawText(
-                    textRenderer,
-                    cur + " / " + req,
-                    startX + 20,
-                    y + 4,
-                    done ? 0x00FF00 : 0xFFFFFF,
-                    false
-            );
-            y += 20;
+            ItemStack stack = new ItemStack(item);
+
+            //render item
+            context.drawItem(stack, startX, y);
+
+            String itemName = stack.getName().getString();
+            String progress = cur + " / " + req;
+            int nameColor = done ? 0x00FF00 : 0xFFFFFF;
+
+            context.drawText(textRenderer, itemName, startX + 20, y, 0xAAAAAA, false);
+            context.drawText(textRenderer, progress, startX + 20, y + 10, nameColor, false);
+
+            y += 24;
         }
     }
 
