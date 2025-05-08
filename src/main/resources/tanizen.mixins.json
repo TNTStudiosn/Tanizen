@@ -6,7 +6,9 @@
   "mixins": [
     "EnchantmentScreenForceLevelOneMixin",
     "LivingEntityMixin",
-    "EnchantmentTableBlockMixin"
+    "EnchantmentTableBlockMixin",
+    "NetherPortalBlockMixin",
+    "EndPortalBlockMixin"
   ],
   "injectors": {
     "defaultRequire": 1
